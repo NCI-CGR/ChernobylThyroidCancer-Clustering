@@ -20,3 +20,5 @@ Here are the Rmarkdown files for the analyses of clustering and PCA in the Chern
 8) data.table
 9) matrixStats
 10) ggfortify
+11) Rmarkdown
+12) BiocParallel
