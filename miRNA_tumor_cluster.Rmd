@@ -60,7 +60,7 @@ top_vst <- vst_tu_data[TopVarGenes, ]
 write.csv(rownames(top_vst),"top100_most_variable_miRNAs_inTumortotalRNA.csv")
 ```
 
-# Hierarchical clusting with the tool the Consensus Cluster Plus
+# Hierarchical clusting with the tool Consensus Cluster Plus
 ```{r,message=FALSE,warning=FALSE}
 library(ConsensusClusterPlus)
 results2 <- ConsensusClusterPlus(top_vst,maxK=10,reps=100,pItem=0.9,pFeature=1,clusterAlg="hc",distance="pearson",plot="png",title="top100_most_variable_miRNAs_tumor_sample_clustering_CCP")
