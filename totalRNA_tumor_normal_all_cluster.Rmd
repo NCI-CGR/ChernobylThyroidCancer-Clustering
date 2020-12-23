@@ -36,7 +36,7 @@ colnames(rna) == rownames(sample)
 
 # Get vst data of all samples
 ```{r,message=FALSE,warning=FALSE}
-dds <- DESeqDataSetFromMatrix(countData = rna,colData = sample,design = ~ ~ Phase + Sex + probality + FinalDriverPathway.10Jan2020)
+dds <- DESeqDataSetFromMatrix(countData = rna,colData = sample,design = ~ Phase + Sex + probality + FinalDriverPathway.10Jan2020)
 keep <- rowSums(counts(dds)) >= 10
 dds <- dds[keep,]
 dds <- DESeq(dds,minReplicatesForReplace=Inf)
