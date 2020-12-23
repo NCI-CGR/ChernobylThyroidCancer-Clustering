@@ -1,0 +1,89 @@
+---
+title: "Hierarchical clusting of tumor samples using the vst expression data of top 1000 most variable genes with the tool the Consensus Cluster Plus"
+author: "Jieqiong Dai"
+date: "`r format(Sys.time(), '%d %B, %Y')`"
+output: 
+      html_document:
+        code_folding: hide
+        toc: true
+        toc_float: true
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(BiocParallel)
+# code from https://hpc.nih.gov/apps/R.html#biocparallel
+detectBatchCPUs <- function() {
+    ncores <- as.integer(Sys.getenv("SLURM_CPUS_PER_TASK"))
+    if (is.na(ncores)) {
+        ncores <- as.integer(Sys.getenv("SLURM_JOB_CPUS_PER_NODE"))
+    }
+        if (is.na(ncores)) {
+                return(4) # for helix
+        }
+        return(ncores)
+}
+ncpus <- detectBatchCPUs()
+```
+
+# Reads in total RNA reads count data
+```{r,message=FALSE,warning=FALSE}
+library(DESeq2)
+rna <- read.csv("phase1234_totalRNA_reads_count_ready.csv",header=T,row.names=1)
+```
+
+# Read in sample table
+```{r,message=FALSE,warning=FALSE}
+sample <- read.csv("totalRNA_sample_table.csv",header=T,row.names=1)
+```
+
+# Match reads count  and sample tables
+```{r,message=FALSE,warning=FALSE,results='hide'}
+sample <- sample[order(rownames(sample)),]
+rna <- rna[,colnames(rna) %in% rownames(sample)]
+rna <- rna[,order(colnames(rna))]
+nrow(rna)
+ncol(rna)
+colnames(rna) == rownames(sample)
+```
+
+# Get vst data of all samples
+```{r,message=FALSE,warning=FALSE}
+dds <- DESeqDataSetFromMatrix(countData = rna,colData = sample,design = ~ ~ Phase + Sex + probality + FinalDriverPathway.10Jan2020)
+keep <- rowSums(counts(dds)) >= 10
+dds <- dds[keep,]
+dds <- DESeq(dds,minReplicatesForReplace=Inf,parallel=TRUE)
+vst <- vst(dds,blind = F)
+write.csv(assay(vst),"totalRNA_vst.csv")
+```
+
+# Take tumor samples only
+```{r,message=FALSE,warning=FALSE}
+sample_tu <- subset(sample, Specimen.Type.ID=="Primary Tumor")
+vst_tu <- vst[,colnames(vst)%in%rownames(sample_tu)]
+vst_tu <- vst_tu[,order(colnames(vst_tu))]
+vst_tu
+vst_tu_data <- assay(vst_tu)
+```
+
+# Get top 1000 most variable genes among tumor samples
+```{r,message=FALSE,warning=FALSE}
+TopVarGenes <- head(order(rowVars(vst_tu_data),decreasing=TRUE),1000)
+top_vst <- vst_tu_data[TopVarGenes, ]
+write.csv(rownames(top_vst),"top1000_most_variable_genes_inTumortotalRNA.csv")
+```
+
+# Hierarchical clusting with the tool the Consensus Cluster Plus
+```{r,message=FALSE,warning=FALSE}
+library(ConsensusClusterPlus)
+results2 <- ConsensusClusterPlus(top_vst,maxK=10,reps=100,pItem=0.9,pFeature=1,clusterAlg="hc",distance="pearson",plot="png",title="top1000_most_variable_genes_totalRNA_tumor_sample_clustering_CCP")
+write.csv(results2[[2]]$consensusClass,"totalRNA_tumor_clust_CCP_top1000mostvariable_k2.csv")
+write.csv(results2[[3]]$consensusClass,"totalRNA_tumor_clust_CCP_top1000mostvariable_k3.csv")
+write.csv(results2[[4]]$consensusClass,"totalRNA_tumor_clust_CCP_top1000mostvariable_k4.csv")
+write.csv(results2[[5]]$consensusClass,"totalRNA_tumor_clust_CCP_top1000mostvariable_k5.csv")
+write.csv(results2[[6]]$consensusClass,"totalRNA_tumor_clust_CCP_top1000mostvariable_k6.csv")
+write.csv(results2[[7]]$consensusClass,"totalRNA_tumor_clust_CCP_top1000mostvariable_k7.csv")
+write.csv(results2[[8]]$consensusClass,"totalRNA_tumor_clust_CCP_top1000mostvariable_k8.csv")
+write.csv(results2[[9]]$consensusClass,"totalRNA_tumor_clust_CCP_top1000mostvariable_k9.csv")
+write.csv(results2[[10]]$consensusClass,"totalRNA_tumor_clust_CCP_top1000mostvariable_k10.csv")
+```
