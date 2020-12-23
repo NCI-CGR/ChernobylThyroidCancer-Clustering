@@ -11,19 +11,6 @@ output:
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
-library(BiocParallel)
-# code from https://hpc.nih.gov/apps/R.html#biocparallel
-detectBatchCPUs <- function() {
-    ncores <- as.integer(Sys.getenv("SLURM_CPUS_PER_TASK"))
-    if (is.na(ncores)) {
-        ncores <- as.integer(Sys.getenv("SLURM_JOB_CPUS_PER_NODE"))
-    }
-        if (is.na(ncores)) {
-                return(4) # for helix
-        }
-        return(ncores)
-}
-ncpus <- detectBatchCPUs()
 ```
 
 # Reads in total RNA reads count data
@@ -52,7 +39,7 @@ colnames(rna) == rownames(sample)
 dds <- DESeqDataSetFromMatrix(countData = rna,colData = sample,design = ~ ~ Phase + Sex + probality + FinalDriverPathway.10Jan2020)
 keep <- rowSums(counts(dds)) >= 10
 dds <- dds[keep,]
-dds <- DESeq(dds,minReplicatesForReplace=Inf,parallel=TRUE)
+dds <- DESeq(dds,minReplicatesForReplace=Inf)
 vst <- vst(dds,blind = F)
 write.csv(assay(vst),"totalRNA_vst.csv")
 vst_data <- assay(vst)
