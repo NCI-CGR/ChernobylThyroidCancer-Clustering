@@ -16,7 +16,7 @@ knitr::opts_chunk$set(echo = TRUE)
 # Reads in total RNA reads count data
 ```{r,message=FALSE,warning=FALSE}
 library(DESeq2)
-rna <- read.csv("phase1234_totalRNA_reads_count_ready.csv",header=T,row.names=1)
+rna <- read.csv("totalRNA_reads_count_ready.csv",header=T,row.names=1)
 ```
 
 # Read in sample table
