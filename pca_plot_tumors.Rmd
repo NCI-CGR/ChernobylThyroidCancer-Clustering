@@ -1,0 +1,192 @@
+---
+title: "PCA plots of tumor samples excluding samples with unknown drivers"
+author: "Jieqiong Dai"
+date: "`r format(Sys.time(), '%d %B, %Y')`"
+output: 
+      html_document:
+        code_folding: hide
+        toc: true
+        toc_float: true
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+# Total RNA
+## Reads in total RNA reads count data
+```{r,message=FALSE,warning=FALSE}
+library(DESeq2)
+rna <- read.csv("phase1234_totalRNA_reads_count_ready.csv",header=T,row.names=1)
+```
+## Read in sample table
+```{r,message=FALSE,warning=FALSE}
+sample <- read.csv("totalRNA_sample_table.csv",header=T,row.names=1)
+```
+## Match reads count and sample tables
+```{r,message=FALSE,warning=FALSE,results='hide'}
+sample <- sample[order(rownames(sample)),]
+rna <- rna[,colnames(rna) %in% rownames(sample)]
+rna <- rna[,order(colnames(rna))]
+nrow(rna)
+ncol(rna)
+colnames(rna) == rownames(sample)
+```
+## Get vst data of all samples
+```{r,message=FALSE,warning=FALSE}
+dds <- DESeqDataSetFromMatrix(countData = rna,colData = sample,design = ~ Phase + Sex + probality + FinalDriverPathway.10Jan2020)
+keep <- rowSums(counts(dds)) >= 10
+dds <- dds[keep,]
+dds <- DESeq(dds,minReplicatesForReplace=Inf)
+vst <- vst(dds,blind = F)
+write.csv(assay(vst),"totalRNA_vst.csv")
+```
+## Read in tumor sample table (excluding samples with unkown drivers) and match total RNA expression data
+```{r,message=FALSE,warning=FALSE,results='hide'}
+sample2 <- read.csv("tumor_sample_drop_unkndown_drivers.csv",header=T,row.names=2)
+sample2 <- sample2[order(rownames(sample2)),]
+sample3 <- sample2[sample2$cluster_mRNA_TP_all_k5!=".",]
+vst2 <- vst[,vst$TSS.Subject.ID %in% rownames(sample3) & vst$Specimen.Type.ID=="Primary Tumor"]
+vst2
+vst2 <- vst2[,order(vst2$TSS.Subject.ID)]
+rownames(sample3)==vst2$TSS.Subject.ID
+vst2 $ Cluster <- as.factor(sample3$cluster_mRNA_TP_all_k5)
+vst2 $ Driver <- as.factor(sample3$finalDriverPathway_v35)
+```
+## PCA plot
+```{r,message=FALSE,warning=FALSE}
+library(ggplot2)
+library(pheatmap)
+library("vsn")
+library(ggthemes)
+library("scales")
+stata_pal(scheme = "s2color")
+show_col(stata_pal("s2color")(15))
+pdf("totalRNA_pca_plot_tumors_exclude_unknown_driver.pdf",width = 10,height = 10)
+pcaData <- plotPCA(vst2, intgroup=c("Driver", "Cluster"), returnData=TRUE)
+percentVar <- round(100 * attr(pcaData, "percentVar"))
+
+ggplot(pcaData, aes(PC1, PC2, color=Driver, shape=Cluster)) +
+  geom_point(size=2) +
+  scale_color_manual(values=c("#1a476f","#ffd200","#55752f","#e37e00","#bfa19c","#c10534","#938dd2","#cac27e")) +
+  scale_shape_manual(values = c(1, 4,5,16,17)) +
+  xlab(paste0("PC1: ",percentVar[1],"% variance")) +
+  ylab(paste0("PC2: ",percentVar[2],"% variance")) + 
+  coord_fixed() +
+  theme(panel.background = element_rect(fill='white',color = 'black'),legend.title = element_text(size=10),legend.text = element_text(size=8),legend.key.size = unit(5,"mm")) +
+  ggtitle("tumor samples exclude samples with unknown drivers, total RNA")
+
+dev.off()
+```
+
+# Micro RNA
+
+## Reads in miRNA reads count data
+```{r,message=FALSE,warning=FALSE}
+mi <- read.csv("phase1234_miRNA_reads_count_ready.csv",header=T,row.names=1)
+```
+## Read in sample table
+```{r,message=FALSE,warning=FALSE}
+sample <- read.csv("miRNA_sample_table.csv",header=T,row.names=1)
+```
+## Match reads count and sample tables
+```{r,message=FALSE,warning=FALSE,results='hide'}
+sample <- sample[order(rownames(sample)),]
+mi <- mi[,colnames(mi) %in% rownames(sample)]
+mi <- mi[,order(colnames(mi))]
+nrow(mi)
+ncol(mi)
+colnames(mi) == rownames(sample)
+```
+## Get get vst data for all samples
+```{r,message=FALSE,warning=FALSE}
+dds <- DESeqDataSetFromMatrix(countData = mi,colData = sample,design = ~ Phase + Sex + probality + FinalDriverPathway.10Jan2020)
+keep <- rowSums(counts(dds)) >= 10
+dds <- dds[keep,]
+dds <- DESeq(dds,minReplicatesForReplace=Inf)
+vst <- vst(dds,blind = F,nsub = 300)
+write.csv(assay(vst),"miRNA_vst.csv")
+```
+## Get tumor sample table (exlucing samples with unknown drivers) and match miRNA expression data
+```{r,message=FALSE,warning=FALSE,results='hide'}
+sample3 <- sample2[sample2$cluster_miRNA_TP_all_k5!=".",]
+vst2 <- vst[,vst$TSS.Subject.ID %in% rownames(sample3) & vst$Specimen.Type.ID=="Primary Tumor"]
+vst2
+vst2 <- vst2[,order(vst2$TSS.Subject.ID)]
+rownames(sample3)==vst2$TSS.Subject.ID
+vst2 $ Cluster <- as.factor(sample3$cluster_miRNA_TP_all_k5)
+vst2 $ Driver <- as.factor(sample3$finalDriverPathway_v35)
+```
+## PCA plot
+```{r,message=FALSE,warning=FALSE}
+pdf("miRNA_pca_plot_tumors_exclude_unknown_driver.pdf",width = 10,height = 10)
+pcaData <- plotPCA(vst2, intgroup=c("Driver", "Cluster"), returnData=TRUE)
+percentVar <- round(100 * attr(pcaData, "percentVar"))
+
+ggplot(pcaData, aes(PC1, PC2, color=Driver, shape=Cluster)) +
+  geom_point(size=2) +
+  scale_color_manual(values=c("#1a476f","#ffd200","#55752f","#e37e00","#bfa19c","#c10534","#938dd2","#cac27e")) +
+  scale_shape_manual(values = c(1, 4,5,16,17)) +
+  xlab(paste0("PC1: ",percentVar[1],"% variance")) +
+  ylab(paste0("PC2: ",percentVar[2],"% variance")) + 
+  coord_fixed() +
+  theme(panel.background = element_rect(fill='white',color = 'black'),legend.title = element_text(size=10),legend.text = element_text(size=8),legend.key.size = unit(5,"mm")) +
+  ggtitle("tumor samples exclude samples with unknown drivers, micro RNA")
+
+dev.off()
+```
+
+# Methylation
+
+## Reads in methylation data
+```{r,message=FALSE,warning=FALSE}
+library(data.table)
+library(matrixStats)
+system.time(beta_all <- (fread("Chernobyl_GP0436-MA1_GP0420-MA1_GP0404-MA1.normBeta.txt",header=T)))
+beta_all <- as.data.frame(beta_all)
+rownames(beta_all) <- beta_all $ TargetID
+beta_all <- beta_all[,order(colnames(beta_all))]
+```
+## Read in tumor sample table (excluding samples with unknown drivers) and match methylation data
+```{r,message=FALSE,warning=FALSE,results='hide'}
+sample <- read.csv("pheno.csv",header=T,row.names=2)
+sample3 <- sample2[sample2$cluster_meth_TP_all_k3!=".",]
+sample3 <- sample3[rownames(sample3),]
+sample <- sample[sample$patient_ID%in%rownames(sample3)&sample$sample=="T",]
+sample <- sample[order(sample$patient_ID),]
+sample$patient_ID==rownames(sample3)
+sample3$id <- rownames(sample)
+sample3 <- sample3[order(sample3$id),]
+beta <- beta_all[,colnames(beta_all)%in% rownames(sample)]
+beta <- beta[,order(colnames(beta))]
+ncol(beta)
+colnames(beta)==sample3$id
+```
+## PCA plot
+```{r,message=FALSE,warning=FALSE}
+library(ggfortify)
+pca <- t(beta)
+pca_data <- prcomp(pca)
+data <- as.data.frame(pca_data $ x)
+rownames(data)==sample3$id
+data $ Cluster <- as.factor(sample3$cluster_meth_TP_all_k3)
+data $ Driver <- as.factor(sample3$finalDriverPathway_v35)
+
+pdf("methylation_pca_plot_tumors_exclude_unknown_driver.pdf",width = 10,height=10)
+percentVar <- round(100 * pca_data$sdev^2 / sum( pca_data$sdev^2 ))
+
+ggplot(data, aes(PC1, PC2, color=Driver, shape=Cluster)) +
+  geom_point(size=2) +
+  scale_color_manual(values=c("#1a476f","#ffd200","#55752f","#e37e00","#bfa19c","#c10534","#938dd2","#cac27e")) +
+  scale_shape_manual(values = c(1,4,5)) +
+  xlab(paste0("PC1: ",percentVar[1],"% variance")) +
+  ylab(paste0("PC2: ",percentVar[2],"% variance")) + 
+  coord_fixed() +
+  theme(panel.background = element_rect(fill='white',color = 'black'),legend.title = element_text(size=10),legend.text = element_text(size=8),legend.key.size = unit(5,"mm")) +
+  guides(color = guide_legend(order = 2),shape = guide_legend(order = 1)) +
+  ggtitle("tumor samples exclude samples with unknown drivers, methylation")
+
+dev.off()
+
+
+```
