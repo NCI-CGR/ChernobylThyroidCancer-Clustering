@@ -1,0 +1,79 @@
+---
+title: "PCA plot of tumor-normal paired samples using the vst expression of all available genes"
+author: "Jieqiong Dai"
+date: "`r format(Sys.time(), '%d %B, %Y')`"
+output: 
+      html_document:
+        code_folding: hide
+        toc: true
+        toc_float: true
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+# Reads in total RNA reads count data
+```{r,message=FALSE,warning=FALSE}
+library(DESeq2)
+rna <- read.csv("phase1234_totalRNA_reads_count_ready.csv",header=T,row.names=1)
+```
+
+# Read in sample table
+```{r,message=FALSE,warning=FALSE}
+sample <- read.csv("totalRNA_sample_table.csv",header=T,row.names=1)
+```
+
+# Match reads count  and sample tables
+```{r,message=FALSE,warning=FALSE,results='hide'}
+sample <- sample[order(rownames(sample)),]
+rna <- rna[,colnames(rna) %in% rownames(sample)]
+rna <- rna[,order(colnames(rna))]
+nrow(rna)
+ncol(rna)
+colnames(rna) == rownames(sample)
+```
+
+# Get vst data of all samples
+```{r,message=FALSE,warning=FALSE}
+dds <- DESeqDataSetFromMatrix(countData = rna,colData = sample,design = ~ Phase + Sex + probality + FinalDriverPathway.10Jan2020)
+keep <- rowSums(counts(dds)) >= 10
+dds <- dds[keep,]
+dds <- DESeq(dds,minReplicatesForReplace=Inf)
+vst <- vst(dds,blind = F)
+write.csv(assay(vst),"totalRNA_vst.csv")
+```
+
+# Read in tumor-normal paired sample table and match total RNA expression data
+```{r,message=FALSE,warning=FALSE}
+sample2 <- read.csv("paired_totalRNA_sample_table.csv",header=T,row.names=1)
+sample2 <- sample2[order(rownames(sample2)),]
+vst2 <- vst[,colnames(vst) %in% rownames(sample2)]
+vst2
+```
+# Read in the k=2 clustering result of all tumor and normal samples using the vst expression data of top 1000 most variable genes with the tool the Consensus Cluster Plus
+```{r,message=FALSE,warning=FALSE}
+cl <- read.csv("totalRNA_tumor_normal_all_clust_CCP_top1000mostvariable_k2.csv",row.names=1)
+cl2 <- cl[rownames(cl)%in%rownames(sample2),drop=F,]
+cl2 <- cl2[order(rownames(cl2)),drop=F,]
+vst2 $ cluster <- as.factor(cl2 $ x)
+```
+
+# PCA plot of the tumoar normal paired samples
+```{r,message=FALSE,warning=FALSE}
+library(ggplot2)
+library(pheatmap)
+library("vsn")
+pdf("totalRNA_pca_plot_paired_samples.pdf")
+
+pcaData <- plotPCA(vst2, intgroup=c("Specimen.Type.ID", "cluster"), returnData=TRUE)
+percentVar <- round(100 * attr(pcaData, "percentVar"))
+ggplot(pcaData, aes(PC1, PC2, color=Specimen.Type.ID, shape=cluster)) +
+  geom_point(size=2) +
+  xlab(paste0("PC1: ",percentVar[1],"% variance")) +
+  ylab(paste0("PC2: ",percentVar[2],"% variance")) + 
+  coord_fixed() +
+  ggtitle("tumor normal paired samples, total RNA")
+dev.off()
+
+```
