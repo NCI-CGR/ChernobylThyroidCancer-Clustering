@@ -16,7 +16,7 @@ knitr::opts_chunk$set(echo = TRUE)
 # Reads in miRNA reads count data
 ```{r,message=FALSE,warning=FALSE}
 library(DESeq2)
-mi <- read.csv("phase1234_miRNA_reads_count_ready.csv",header=T,row.names=1)
+mi <- read.csv("miRNA_reads_count.csv",header=T,row.names=1)
 ```
 
 # Read in sample table
@@ -34,7 +34,7 @@ ncol(mi)
 colnames(mi) == rownames(sample)
 ```
 
-# Get get vst data for all samples
+# Get get vst data for all samples using DESeq2
 ```{r,message=FALSE,warning=FALSE}
 dds <- DESeqDataSetFromMatrix(countData = mi,colData = sample,design = ~ Phase + Sex + probality + FinalDriverPathway.10Jan2020)
 keep <- rowSums(counts(dds)) >= 10
@@ -44,7 +44,7 @@ vst <- vst(dds,blind = F,nsub = 300)
 write.csv(assay(vst),"miRNA_vst.csv")
 ```
 
-# Take tumor samples only
+# Select tumor samples
 ```{r,message=FALSE,warning=FALSE}
 sample_tu <- subset(sample, Specimen.Type.ID=="Primary Tumor")
 vst_tu <- vst[,colnames(vst)%in%rownames(sample_tu)]
