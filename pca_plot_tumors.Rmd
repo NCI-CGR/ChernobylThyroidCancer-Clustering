@@ -17,7 +17,7 @@ knitr::opts_chunk$set(echo = TRUE)
 ## Reads in total RNA reads count data
 ```{r,message=FALSE,warning=FALSE}
 library(DESeq2)
-rna <- read.csv("phase1234_totalRNA_reads_count_ready.csv",header=T,row.names=1)
+rna <- read.csv("totalRNA_reads_count_ready.csv",header=T,row.names=1)
 ```
 ## Read in sample table
 ```{r,message=FALSE,warning=FALSE}
@@ -83,7 +83,7 @@ dev.off()
 
 ## Reads in miRNA reads count data
 ```{r,message=FALSE,warning=FALSE}
-mi <- read.csv("phase1234_miRNA_reads_count_ready.csv",header=T,row.names=1)
+mi <- read.csv("miRNA_reads_count_ready.csv",header=T,row.names=1)
 ```
 ## Read in sample table
 ```{r,message=FALSE,warning=FALSE}
@@ -142,7 +142,7 @@ dev.off()
 ```{r,message=FALSE,warning=FALSE}
 library(data.table)
 library(matrixStats)
-system.time(beta_all <- (fread("Chernobyl_GP0436-MA1_GP0420-MA1_GP0404-MA1.normBeta.txt",header=T)))
+system.time(beta_all <- (fread("normBeta.txt",header=T)))
 beta_all <- as.data.frame(beta_all)
 rownames(beta_all) <- beta_all $ TargetID
 beta_all <- beta_all[,order(colnames(beta_all))]
