@@ -1,0 +1,57 @@
+---
+title: "Hierarchical clusting of tumor samples using the normalized beta value of most variably methylated 3000 cpg islands with the tool the Consensus Cluster Plus"
+author: "Jieqiong Dai"
+date: "`r format(Sys.time(), '%d %B, %Y')`"
+output: 
+      html_document:
+        code_folding: hide
+        toc: true
+        toc_float: true
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+# Reads in methylation normalized beta data
+```{r,message=FALSE,warning=FALSE}
+library(data.table)
+library(matrixStats)
+system.time(beta_all <- (fread("Chernobyl_GP0436-MA1_GP0420-MA1_GP0404-MA1.normBeta.txt",header=T)))
+beta_all <- as.data.frame(beta_all)
+rownames(beta_all) <- beta_all $ TargetID
+beta_all <- beta_all[,order(colnames(beta_all))]
+```
+
+# Read in sample table and get tumor sample beta data
+```{r,message=FALSE,warning=FALSE,results='hide'}
+pheno <- read.csv("pheno.csv",row.names=2,header=T)
+pheno <- pheno[rownames(pheno)%in%colnames(beta_all),]
+pheno <- pheno[order(rownames(pheno)),]
+pheno <- pheno[pheno $ sample =="T",]
+beta <- beta_all[,colnames(beta_all)%in%rownames(pheno)]
+colnames(beta)==rownames(pheno)
+beta <- as.matrix(beta)
+```
+
+# Get top 3000 most variable cpg islands
+```{r,message=FALSE,warning=FALSE}
+TopVarGenes <- head(order(rowVars(beta),decreasing=TRUE),3000)
+top_beta <- beta[ TopVarGenes, ]
+write.csv(rownames(top_beta),"top3000_most_variable_cpg_inmethylation.csv",row.names=F)
+```
+
+# Hierarchical clusting with the tool Consensus Cluster Plus
+```{r,message=FALSE,warning=FALSE}
+library(ConsensusClusterPlus)
+results2 <- ConsensusClusterPlus(top_beta,maxK=10,reps=100,pItem=0.9,pFeature=1,clusterAlg="hc",distance="pearson",plot="png",title="meth_clust_CCP_top3000")
+write.csv(results2[[2]]$consensusClass,"meth_clust_CCP_top3000_k2.csv")
+write.csv(results2[[3]]$consensusClass,"meth_clust_CCP_top3000_k3.csv")
+write.csv(results2[[4]]$consensusClass,"meth_clust_CCP_top3000_k4.csv")
+write.csv(results2[[5]]$consensusClass,"meth_clust_CCP_top3000_k5.csv")
+write.csv(results2[[6]]$consensusClass,"meth_clust_CCP_top3000_k6.csv")
+write.csv(results2[[7]]$consensusClass,"meth_clust_CCP_top3000_k7.csv")
+write.csv(results2[[8]]$consensusClass,"meth_clust_CCP_top3000_k8.csv")
+write.csv(results2[[9]]$consensusClass,"meth_clust_CCP_top3000_k9.csv")
+write.csv(results2[[10]]$consensusClass,"meth_clust_CCP_top3000_k10.csv")
+```
