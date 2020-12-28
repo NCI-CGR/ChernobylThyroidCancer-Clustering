@@ -16,7 +16,7 @@ knitr::opts_chunk$set(echo = TRUE)
 # Reads in total RNA reads count data
 ```{r,message=FALSE,warning=FALSE}
 library(DESeq2)
-rna <- read.csv("phase1234_totalRNA_reads_count_ready.csv",header=T,row.names=1)
+rna <- read.csv("totalRNA_reads_count_ready.csv",header=T,row.names=1)
 ```
 
 # Read in sample table
@@ -24,7 +24,7 @@ rna <- read.csv("phase1234_totalRNA_reads_count_ready.csv",header=T,row.names=1)
 sample <- read.csv("totalRNA_sample_table.csv",header=T,row.names=1)
 ```
 
-# Match reads count  and sample tables
+# Match reads count and sample tables
 ```{r,message=FALSE,warning=FALSE,results='hide'}
 sample <- sample[order(rownames(sample)),]
 rna <- rna[,colnames(rna) %in% rownames(sample)]
@@ -34,7 +34,7 @@ ncol(rna)
 colnames(rna) == rownames(sample)
 ```
 
-# Get vst data of all samples
+# Get vst data of all samples using DESeq2
 ```{r,message=FALSE,warning=FALSE}
 dds <- DESeqDataSetFromMatrix(countData = rna,colData = sample,design = ~ Phase + Sex + probality + FinalDriverPathway.10Jan2020)
 keep <- rowSums(counts(dds)) >= 10
