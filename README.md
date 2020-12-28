@@ -6,6 +6,8 @@ Here are the Rmarkdown files for the analyses of clustering and PCA in the Chern
 2) miRNA_tumor_cluster.Rmd: Hierarchical clusting of tumor samples using the vst expression data of top 100 most variable microRNAs with the tool the Consensus Cluster Plus
 3) methylation_tumor_cluster.Rmd: Hierarchical clusting of tumor samples using the normalized beta value of most variably methylated 3000 cpg islands with the tool the Consensus Cluster Plus
 4) pca_plot_tumors.Rmd: PCA plots of tumor samples excluding samples with unknown drivers. In RNA-seq data, the vst expression of all available genes was used for PCA. In miRNA-seq data, the vst expression of all available miRNAs was used for PCA. In methylation data, the normalized beta value of all available cpg islands was used for PCA. 
+5) totalRNA_tumor_normal_all_cluster.Rmd: Hierarchical clusting of all tumor and normal samples using the vst expression data of top 1000 most variable genes with the tool the Consensus Cluster Plus
+6) pca_plot_paired_samples_totalRNA.Rmd: PCA plot of tumor-normal paired samples using the vst expression of all available genes
 ## III. Required R packages
 1) DESeq2
 2) ConsensusClusterPlus
