@@ -17,7 +17,7 @@ knitr::opts_chunk$set(echo = TRUE)
 ```{r,message=FALSE,warning=FALSE}
 library(data.table)
 library(matrixStats)
-system.time(beta_all <- (fread("Chernobyl_GP0436-MA1_GP0420-MA1_GP0404-MA1.normBeta.txt",header=T)))
+system.time(beta_all <- (fread("normBeta.txt",header=T)))
 beta_all <- as.data.frame(beta_all)
 rownames(beta_all) <- beta_all $ TargetID
 beta_all <- beta_all[,order(colnames(beta_all))]
