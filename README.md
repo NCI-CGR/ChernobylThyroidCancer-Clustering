@@ -9,14 +9,14 @@ Here are the Rmarkdown files for the analyses of clustering and PCA in the Chern
 5) totalRNA_tumor_normal_all_cluster.Rmd: Hierarchical clusting of all tumor and normal samples using the vst expression data of top 1000 most variable genes with the tool the Consensus Cluster Plus
 6) pca_plot_paired_samples_totalRNA.Rmd: PCA plot of tumor-normal paired samples using the vst expression of all available genes
 ## III. Required R packages
-1) DESeq2
-2) ConsensusClusterPlus
-3) ggplot2
-4) pheatmap
-5) vsn
-6) ggthemes
-7) scales
-8) data.table
-9) matrixStats
-10) ggfortify
-11) Rmarkdown
+1) [DESeq2](https://bioconductor.org/packages/release/bioc/html/DESeq2.html)
+2) [ConsensusClusterPlus](https://bioconductor.org/packages/release/bioc/html/ConsensusClusterPlus.html)
+3) [ggplot2](https://cran.r-project.org/web/packages/ggplot2/index.html)
+4) [pheatmap](https://cran.r-project.org/web/packages/pheatmap/index.html)
+5) [vsn](https://www.bioconductor.org/packages/release/bioc/html/vsn.html)
+6) [ggthemes](https://cran.r-project.org/web/packages/ggthemes/index.html)
+7) [scales](https://cran.r-project.org/web/packages/scales/index.html)
+8) [data.table](https://cran.r-project.org/web/packages/data.table/index.html)
+9) [matrixStats](https://cran.rstudio.com/web/packages/matrixStats/index.html)
+10) [ggfortify](https://cran.r-project.org/web/packages/ggfortify/index.html)
+11) [rmarkdown](https://cran.r-project.org/web/packages/rmarkdown/index.html)
