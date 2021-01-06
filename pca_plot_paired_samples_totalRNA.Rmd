@@ -1,5 +1,5 @@
 ---
-title: "PCA plot of tumor-normal paired samples using the vst expression of all available genes"
+title: "PCA plot of tumor-normal paired samples using the vst expression data of all available genes"
 author: "Jieqiong Dai"
 date: "`r format(Sys.time(), '%d %B, %Y')`"
 output: 
