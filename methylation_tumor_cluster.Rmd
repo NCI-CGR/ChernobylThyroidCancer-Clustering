@@ -1,5 +1,5 @@
 ---
-title: "Hierarchical clusting of tumor samples using the normalized beta value of most variably methylated 3000 cpg islands with the tool the Consensus Cluster Plus"
+title: "Hierarchical clusting of tumor samples using the normalized beta value of top 3000 most variably methylated cpg islands with the tool the Consensus Cluster Plus"
 author: "Jieqiong Dai"
 date: "`r format(Sys.time(), '%d %B, %Y')`"
 output: 
