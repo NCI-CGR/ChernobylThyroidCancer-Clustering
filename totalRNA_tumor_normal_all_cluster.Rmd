@@ -13,7 +13,7 @@ output:
 knitr::opts_chunk$set(echo = TRUE)
 ```
 
-# Reads in total RNA reads count data
+# Read in total RNA reads count data
 ```{r,message=FALSE,warning=FALSE}
 library(DESeq2)
 rna <- read.csv("totalRNA_reads_count_ready.csv",header=T,row.names=1)
