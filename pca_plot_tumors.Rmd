@@ -14,7 +14,7 @@ knitr::opts_chunk$set(echo = TRUE)
 ```
 
 # Total RNA
-## Reads in total RNA reads count data
+## Read in total RNA reads count data
 ```{r,message=FALSE,warning=FALSE}
 library(DESeq2)
 rna <- read.csv("totalRNA_reads_count_ready.csv",header=T,row.names=1)
@@ -32,7 +32,7 @@ nrow(rna)
 ncol(rna)
 colnames(rna) == rownames(sample)
 ```
-## Get vst data of all samples
+## Get vst data of all samples using DESeq2
 ```{r,message=FALSE,warning=FALSE}
 dds <- DESeqDataSetFromMatrix(countData = rna,colData = sample,design = ~ Phase + Sex + probality + FinalDriverPathway.10Jan2020)
 keep <- rowSums(counts(dds)) >= 10
@@ -81,7 +81,7 @@ dev.off()
 
 # Micro RNA
 
-## Reads in miRNA reads count data
+## Read in miRNA reads count data
 ```{r,message=FALSE,warning=FALSE}
 mi <- read.csv("miRNA_reads_count_ready.csv",header=T,row.names=1)
 ```
@@ -98,7 +98,7 @@ nrow(mi)
 ncol(mi)
 colnames(mi) == rownames(sample)
 ```
-## Get get vst data for all samples
+## Get vst data for all samples
 ```{r,message=FALSE,warning=FALSE}
 dds <- DESeqDataSetFromMatrix(countData = mi,colData = sample,design = ~ Phase + Sex + probality + FinalDriverPathway.10Jan2020)
 keep <- rowSums(counts(dds)) >= 10
@@ -138,7 +138,7 @@ dev.off()
 
 # Methylation
 
-## Reads in methylation data
+## Read in methylation data
 ```{r,message=FALSE,warning=FALSE}
 library(data.table)
 library(matrixStats)
