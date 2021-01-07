@@ -13,7 +13,7 @@ output:
 knitr::opts_chunk$set(echo = TRUE)
 ```
 
-# Reads in methylation normalized beta data
+# Read in methylation normalized beta data
 ```{r,message=FALSE,warning=FALSE}
 library(data.table)
 library(matrixStats)
@@ -37,7 +37,7 @@ beta <- as.matrix(beta)
 # Get top 3000 most variable cpg islands
 ```{r,message=FALSE,warning=FALSE}
 TopVarGenes <- head(order(rowVars(beta),decreasing=TRUE),3000)
-top_beta <- beta[ TopVarGenes, ]
+top_beta <- beta[TopVarGenes, ]
 write.csv(rownames(top_beta),"top3000_most_variable_cpg_inmethylation.csv",row.names=F)
 ```
 
