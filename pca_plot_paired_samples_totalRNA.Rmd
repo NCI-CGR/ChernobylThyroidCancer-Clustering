@@ -13,7 +13,7 @@ output:
 knitr::opts_chunk$set(echo = TRUE)
 ```
 
-# Reads in total RNA reads count data
+# Read in total RNA reads count data
 ```{r,message=FALSE,warning=FALSE}
 library(DESeq2)
 rna <- read.csv("totalRNA_reads_count_ready.csv",header=T,row.names=1)
@@ -34,7 +34,7 @@ ncol(rna)
 colnames(rna) == rownames(sample)
 ```
 
-# Get vst data of all samples
+# Get vst data of all samples using DESeq2
 ```{r,message=FALSE,warning=FALSE}
 dds <- DESeqDataSetFromMatrix(countData = rna,colData = sample,design = ~ Phase + Sex + probality + FinalDriverPathway.10Jan2020)
 keep <- rowSums(counts(dds)) >= 10
