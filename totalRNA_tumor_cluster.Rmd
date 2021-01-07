@@ -12,7 +12,7 @@ output:
 ```{r setup, include=FALSE}
 ```
 
-# Reads in total RNA reads count data
+# Read in total RNA reads count data
 ```{r,message=FALSE,warning=FALSE}
 library(DESeq2)
 rna <- read.csv("totalRNA_reads_count.csv",header=T,row.names=1)
