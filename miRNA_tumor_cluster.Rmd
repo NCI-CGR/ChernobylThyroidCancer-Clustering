@@ -13,7 +13,7 @@ output:
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
 ```
-# Reads in miRNA reads count data
+# Read in miRNA reads count data
 ```{r,message=FALSE,warning=FALSE}
 library(DESeq2)
 mi <- read.csv("miRNA_reads_count.csv",header=T,row.names=1)
@@ -34,7 +34,7 @@ ncol(mi)
 colnames(mi) == rownames(sample)
 ```
 
-# Get get vst data for all samples using DESeq2
+# Get vst data for all samples using DESeq2
 ```{r,message=FALSE,warning=FALSE}
 dds <- DESeqDataSetFromMatrix(countData = mi,colData = sample,design = ~ Phase + Sex + probality + FinalDriverPathway.10Jan2020)
 keep <- rowSums(counts(dds)) >= 10
